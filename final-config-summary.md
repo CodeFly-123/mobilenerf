@@ -12,7 +12,7 @@
 - **API密钥**: 需要替换为您的实际密钥
 
 ### 2. MCP服务配置
-- **目标地址**: `http://10.33.15.4:8782/mcp`
+- **目标地址**: `http://10.33.15.3:8796/mcp`
 - **连接方式**: streamable-http
 
 ## 快速启动
@@ -38,7 +38,7 @@ node custom-vision-mcp-server.js
   "mcpServers": {
     "vision-mcp-server": {
       "type": "streamable-http",
-      "url": "http://10.33.15.4:8782/mcp"
+      "url": "http://10.33.15.3:8796/mcp"
     }
   }
 }
