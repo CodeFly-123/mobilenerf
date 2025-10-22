@@ -17,11 +17,10 @@
 
 ## 快速启动
 
-### 1. 设置环境变量
-```bash
-export CUSTOM_API_KEY="your-actual-api-key"
-export CUSTOM_BASE_URL="http://10.33.15.1:8808/v1"
-export CUSTOM_MODEL="Qwen2.5-VL-7B-Instruct"
+### 1. 配置API密钥
+编辑 `custom-vision-mcp-server.js` 文件，将API密钥替换为您的实际密钥：
+```javascript
+const CUSTOM_API_KEY = "your-actual-api-key";  // 替换为您的实际API密钥
 ```
 
 ### 2. 启动MCP服务器
@@ -37,14 +36,9 @@ node custom-vision-mcp-server.js
 ```json
 {
   "mcpServers": {
-    "custom-vision-mcp-server": {
+    "vision-mcp-server": {
       "type": "streamable-http",
-      "url": "http://10.33.15.4:8782/mcp",
-      "env": {
-        "CUSTOM_API_KEY": "your-actual-api-key",
-        "CUSTOM_BASE_URL": "http://10.33.15.1:8808/v1",
-        "CUSTOM_MODEL": "Qwen2.5-VL-7B-Instruct"
-      }
+      "url": "http://10.33.15.4:8782/mcp"
     }
   }
 }
@@ -71,7 +65,7 @@ node custom-vision-mcp-server.js
 
 ## 下一步操作
 
-1. **替换API密钥**: 将配置中的`your-actual-api-key`替换为您的实际API密钥
+1. **替换API密钥**: 编辑`custom-vision-mcp-server.js`文件，将`your-api-key-here`替换为您的实际API密钥
 2. **测试连接**: 运行`node test-vision-mcp.js`测试配置
 3. **在Dify中配置**: 使用提供的JSON配置在Dify中设置MCP服务工具
 4. **验证功能**: 在Dify中测试图片分析功能

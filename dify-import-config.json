@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "custom-vision-mcp-server": {
+    "vision-mcp-server": {
       "type": "streamable-http",
       "url": "http://10.33.15.4:8782/mcp"
     }

@@ -11,29 +11,15 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 从环境变量获取配置
-const CUSTOM_API_KEY = process.env.CUSTOM_API_KEY || "your-api-key-here";
-const CUSTOM_BASE_URL = process.env.CUSTOM_BASE_URL || "http://10.33.15.1:8808/v1";
-const CUSTOM_MODEL = process.env.CUSTOM_MODEL || "Qwen2.5-VL-7B-Instruct";
+// 直接配置API参数（无需环境变量）
+const CUSTOM_API_KEY = "your-api-key-here";  // 请替换为您的实际API密钥
+const CUSTOM_BASE_URL = "http://10.33.15.1:8808/v1";
+const CUSTOM_MODEL = "Qwen2.5-VL-7B-Instruct";
 
-// 使用更静默的错误处理，避免干扰MCP通信
+// 检查API密钥是否已配置
 if (!CUSTOM_API_KEY || CUSTOM_API_KEY === "your-api-key-here") {
-    process.stderr.write("错误：未设置CUSTOM_API_KEY环境变量\n");
-    process.stderr.write("请在客户端配置中设置环境变量，例如：\n");
-    process.stderr.write(JSON.stringify({
-        "mcpServers": {
-            "custom-vision-mcp-server": {
-                "type": "stdio",
-                "command": "node",
-                "args": ["/workspace/custom-vision-mcp-server.js"],
-                "env": {
-                    "CUSTOM_API_KEY": "your-api-key-here",
-                    "CUSTOM_BASE_URL": "http://10.33.15.1:8808/v1",
-                    "CUSTOM_MODEL": "Qwen2.5-VL-7B-Instruct"
-                }
-            }
-        }
-    }, null, 2) + "\n");
+    process.stderr.write("错误：请在代码中设置正确的CUSTOM_API_KEY\n");
+    process.stderr.write("请编辑 custom-vision-mcp-server.js 文件，将 'your-api-key-here' 替换为您的实际API密钥\n");
     process.exit(1);
 }
 

@@ -3,12 +3,7 @@
     "custom-vision-mcp-server": {
       "type": "stdio",
       "command": "node",
-      "args": ["/workspace/custom-vision-mcp-server.js"],
-      "env": {
-        "CUSTOM_API_KEY": "your-api-key-here",
-        "CUSTOM_BASE_URL": "http://10.33.15.1:8808/v1",
-        "CUSTOM_MODEL": "Qwen2.5-VL-7B-Instruct"
-      }
+      "args": ["/workspace/custom-vision-mcp-server.js"]
     }
   }
 }

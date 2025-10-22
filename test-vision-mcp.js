@@ -6,17 +6,8 @@ import fs from 'fs';
 
 console.log('Testing Custom Vision MCP Server...\n');
 
-// 设置环境变量
-const env = {
-    ...process.env,
-    CUSTOM_API_KEY: "your-api-key-here",
-    CUSTOM_BASE_URL: "http://10.33.15.1:8808/v1",
-    CUSTOM_MODEL: "Qwen2.5-VL-7B-Instruct"
-};
-
-// 启动MCP服务器
+// 启动MCP服务器（无需环境变量）
 const mcpServer = spawn('node', ['/workspace/custom-vision-mcp-server.js'], {
-    env: env,
     stdio: ['pipe', 'pipe', 'pipe']
 });
 

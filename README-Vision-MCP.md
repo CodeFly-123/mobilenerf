@@ -4,12 +4,12 @@
 
 本项目配置了一个自定义的Vision MCP Server，用于连接您部署的Qwen2.5-VL-7B-Instruct模型，支持streamable-http方式连接到Dify的MCP服务工具。
 
-## 环境配置
+## 配置说明
 
-### 1. 模型服务器配置
+### 1. 模型服务器配置（已内置）
 - **模型地址**: `http://10.33.15.1:8808/v1`
 - **模型名称**: `Qwen2.5-VL-7B-Instruct`
-- **API密钥**: 需要替换为您的实际API密钥
+- **API密钥**: 需要在代码中设置（见下方说明）
 
 ### 2. MCP服务配置
 - **目标地址**: `http://10.33.15.4:8782/mcp`
@@ -29,14 +29,13 @@
 
 ## 使用方法
 
-### 1. 配置环境变量
+### 1. 配置API密钥
 
-在启动前，需要设置以下环境变量：
+在启动前，需要编辑 `custom-vision-mcp-server.js` 文件，将API密钥替换为您的实际密钥：
 
-```bash
-export CUSTOM_API_KEY="your-actual-api-key"
-export CUSTOM_BASE_URL="http://10.33.15.1:8808/v1"
-export CUSTOM_MODEL="Qwen2.5-VL-7B-Instruct"
+```javascript
+// 在文件顶部找到这行并替换
+const CUSTOM_API_KEY = "your-actual-api-key";  // 替换为您的实际API密钥
 ```
 
 ### 2. 启动MCP服务器
@@ -57,14 +56,9 @@ node /workspace/custom-vision-mcp-server.js
 ```json
 {
   "mcpServers": {
-    "custom-vision-mcp-server": {
+    "vision-mcp-server": {
       "type": "streamable-http",
-      "url": "http://10.33.15.4:8782/mcp",
-      "env": {
-        "CUSTOM_API_KEY": "your-actual-api-key",
-        "CUSTOM_BASE_URL": "http://10.33.15.1:8808/v1",
-        "CUSTOM_MODEL": "Qwen2.5-VL-7B-Instruct"
-      }
+      "url": "http://10.33.15.4:8782/mcp"
     }
   }
 }
@@ -74,15 +68,10 @@ node /workspace/custom-vision-mcp-server.js
 ```json
 {
   "mcpServers": {
-    "custom-vision-mcp-server": {
+    "vision-mcp-server": {
       "type": "stdio",
       "command": "node",
-      "args": ["/workspace/custom-vision-mcp-server.js"],
-      "env": {
-        "CUSTOM_API_KEY": "your-actual-api-key",
-        "CUSTOM_BASE_URL": "http://10.33.15.1:8808/v1",
-        "CUSTOM_MODEL": "Qwen2.5-VL-7B-Instruct"
-      }
+      "args": ["/workspace/custom-vision-mcp-server.js"]
     }
   }
 }
