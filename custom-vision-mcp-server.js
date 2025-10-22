@@ -19,7 +19,7 @@ const CUSTOM_MODEL = "Qwen2.5-VL-7B-Instruct";
 
 // HTTP服务器配置
 const HTTP_PORT = 8796;
-const HTTP_HOST = "0.0.0.0";
+const HTTP_HOST = "0.0.0.0";  // 绑定到所有接口
 
 // 检查API密钥是否已配置
 if (!CUSTOM_API_KEY || CUSTOM_API_KEY === "your-api-key-here") {
