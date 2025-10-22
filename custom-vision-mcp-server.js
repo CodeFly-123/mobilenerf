@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import http from 'http';
 import { z } from 'zod';
 import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { OpenAI } from 'openai';
@@ -12,9 +13,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 直接配置API参数（无需环境变量）
-const CUSTOM_API_KEY = "your-api-key-here";  // 请替换为您的实际API密钥
+const CUSTOM_API_KEY = "test-api-key";  // 请替换为您的实际API密钥
 const CUSTOM_BASE_URL = "http://10.33.15.1:8808/v1";
 const CUSTOM_MODEL = "Qwen2.5-VL-7B-Instruct";
+
+// HTTP服务器配置
+const HTTP_PORT = 8796;
+const HTTP_HOST = "0.0.0.0";
 
 // 检查API密钥是否已配置
 if (!CUSTOM_API_KEY || CUSTOM_API_KEY === "your-api-key-here") {
@@ -339,19 +344,168 @@ class McpServerApplication {
             // 注册工具
             await this.registerTools();
             
-            // 创建传输层
-            const transport = new StdioServerTransport();
-            
-            // 连接服务器和传输层
-            await this.server.connect(transport);
-            
-            process.stderr.write(`Custom Vision MCP Server started successfully\n`);
-            process.stderr.write(`API Base URL: ${baseURL}\n`);
-            process.stderr.write(`Model: ${model}\n`);
+            // 检查是否以HTTP模式启动
+            if (process.argv.includes('--http')) {
+                await this.startHttpServer();
+            } else {
+                await this.startStdioServer();
+            }
         } catch (error) {
             process.stderr.write(`Failed to start server: ${error.message}\n`);
             this.gracefulShutdown(1);
         }
+    }
+    
+    /**
+     * 启动HTTP服务器
+     */
+    async startHttpServer() {
+        const httpServer = http.createServer((req, res) => {
+            // 设置CORS头
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+            res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+            
+            if (req.method === 'OPTIONS') {
+                res.writeHead(200);
+                res.end();
+                return;
+            }
+            
+            if (req.url === '/mcp' && req.method === 'POST') {
+                let body = '';
+                req.on('data', chunk => {
+                    body += chunk.toString();
+                });
+                
+                req.on('end', async () => {
+                    try {
+                        const request = JSON.parse(body);
+                        const response = await this.handleMcpRequest(request);
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify(response));
+                    } catch (error) {
+                        res.writeHead(500, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: error.message }));
+                    }
+                });
+            } else {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Not found' }));
+            }
+        });
+        
+        // 启动HTTP服务器
+        httpServer.listen(HTTP_PORT, HTTP_HOST, () => {
+            process.stderr.write(`Custom Vision MCP Server started successfully\n`);
+            process.stderr.write(`HTTP Server: http://${HTTP_HOST}:${HTTP_PORT}/mcp\n`);
+            process.stderr.write(`API Base URL: ${baseURL}\n`);
+            process.stderr.write(`Model: ${model}\n`);
+        });
+        
+        // 处理服务器错误
+        httpServer.on('error', (error) => {
+            process.stderr.write(`HTTP Server error: ${error.message}\n`);
+            this.gracefulShutdown(1);
+        });
+    }
+    
+    /**
+     * 处理MCP请求
+     */
+    async handleMcpRequest(request) {
+        try {
+            if (request.method === 'tools/list') {
+                return {
+                    jsonrpc: "2.0",
+                    id: request.id,
+                    result: {
+                        tools: [
+                            {
+                                name: "analyze_image",
+                                description: "分析图片内容并提供详细描述",
+                                inputSchema: {
+                                    type: "object",
+                                    properties: {
+                                        image: {
+                                            type: "string",
+                                            description: "图片URL或本地文件路径",
+                                        },
+                                        prompt: {
+                                            type: "string",
+                                            description: "对图片的问题或分析要求",
+                                            default: "请描述这张图片的内容",
+                                        },
+                                    },
+                                    required: ["image"],
+                                },
+                            },
+                        ],
+                    }
+                };
+            } else if (request.method === 'tools/call') {
+                const { name, arguments: args } = request.params;
+                if (name === "analyze_image") {
+                    const imageAnalysisService = new ImageAnalysisService(apiKey, baseURL, model);
+                    const result = await imageAnalysisService.analyzeImage(args);
+                    return {
+                        jsonrpc: "2.0",
+                        id: request.id,
+                        result: {
+                            content: [
+                                {
+                                    type: "text",
+                                    text: result,
+                                },
+                            ],
+                        }
+                    };
+                } else {
+                    return {
+                        jsonrpc: "2.0",
+                        id: request.id,
+                        error: {
+                            code: -32601,
+                            message: `Unknown tool: ${name}`
+                        }
+                    };
+                }
+            } else {
+                return {
+                    jsonrpc: "2.0",
+                    id: request.id,
+                    error: {
+                        code: -32601,
+                        message: `Unknown method: ${request.method}`
+                    }
+                };
+            }
+        } catch (error) {
+            return {
+                jsonrpc: "2.0",
+                id: request.id,
+                error: {
+                    code: -32603,
+                    message: error.message
+                }
+            };
+        }
+    }
+    
+    /**
+     * 启动stdio服务器
+     */
+    async startStdioServer() {
+        // 创建stdio传输层
+        const transport = new StdioServerTransport();
+        
+        // 连接服务器和传输层
+        await this.server.connect(transport);
+        
+        process.stderr.write(`Custom Vision MCP Server started successfully\n`);
+        process.stderr.write(`Mode: stdio\n`);
+        process.stderr.write(`API Base URL: ${baseURL}\n`);
+        process.stderr.write(`Model: ${model}\n`);
     }
 }
 
