@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "custom-vision-mcp-server": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/workspace/custom-vision-mcp-server.js"]
+    }
+  }
+}

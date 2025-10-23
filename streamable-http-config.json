@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "vision-mcp-server": {
+      "type": "streamable-http",
+      "url": "http://10.33.15.3:8796/mcp"
+    }
+  }
+}

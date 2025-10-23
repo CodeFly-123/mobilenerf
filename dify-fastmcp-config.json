@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "fastmcp-vision-server": {
+      "type": "streamable-http",
+      "url": "http://3.136.170.51:8796/mcp",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      }
+    }
+  }
+}
