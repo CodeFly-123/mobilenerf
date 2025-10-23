@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "fastmcp-vision-server": {
+      "command": "node",
+      "args": ["/workspace/fastmcp-vision-server.js"],
+      "env": {
+        "CUSTOM_API_KEY": "your-actual-api-key-here",
+        "CUSTOM_BASE_URL": "http://10.33.15.1:8808/v1",
+        "CUSTOM_MODEL": "Qwen2.5-VL-7B-Instruct"
+      }
+    }
+  }
+}

@@ -7,10 +7,13 @@
   "scripts": {
     "start": "node custom-vision-mcp-server.js",
     "start:http": "node custom-vision-mcp-server.js --http",
-    "start:stdio": "node custom-vision-mcp-server.js"
+    "start:stdio": "node custom-vision-mcp-server.js",
+    "start:fastmcp": "node fastmcp-vision-server.js",
+    "start:fastmcp:http": "node fastmcp-vision-server.js --http"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
+    "fastmcp": "^3.21.0",
     "openai": "^4.28.4",
     "zod": "^3.22.4"
   },
