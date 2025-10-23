@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { FastMCP } from 'fastmcp';
+import { FastMCP } from 'fastmcp/dist/FastMCP.js';
 import { OpenAI } from 'openai';
 import fs from 'fs';
 import path from 'path';
@@ -30,10 +30,20 @@ const openai = new OpenAI({
 });
 
 // 创建FastMCP服务器
-const mcp = new FastMCP("Custom Vision MCP Server");
+const mcp = new FastMCP({
+    name: "Custom Vision MCP Server",
+    tools: [],
+    prompts: [],
+    resources: [],
+    resourcesTemplates: [],
+    logger: console
+});
 
 // 图片分析工具
-mcp.tool("analyze_image", "分析图片内容并提供详细描述", {
+mcp.addTool({
+    name: "analyze_image",
+    description: "分析图片内容并提供详细描述",
+    parameters: {
     type: "object",
     properties: {
         image: {
@@ -47,7 +57,8 @@ mcp.tool("analyze_image", "分析图片内容并提供详细描述", {
         }
     },
     required: ["image"]
-}, async (args) => {
+},
+async (args) => {
     try {
         console.log(`[FastMCP] 开始分析图片: ${args.image}`);
         console.log(`[FastMCP] 分析提示: ${args.prompt}`);
